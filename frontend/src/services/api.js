@@ -10,28 +10,40 @@ const api = axios.create({
 });
 
 export const jobService = {
-  getAllJobs: async () => {
-    const response = await api.get('/jobs/');
+  getAllJobs: async (token, filters = {}) => {
+    const { status = 'all', search = '', sortBy = 'dateApplied' } = filters;
+    const response = await api.get('/jobs/', {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { status, search, sortBy }
+    });
     return response.data;
   },
 
-  createJob: async (jobData) => {
-    const response = await api.post('/jobs/', jobData);
+  createJob: async (token, jobData) => {
+    const response = await api.post('/jobs/', jobData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
     return response.data;
   },
 
-  updateJob: async (id, jobData) => {
-    const response = await api.put(`/jobs/${id}`, jobData);
+  updateJob: async (token, jobId, updates) => {
+    const response = await api.put(`/jobs/${jobId}`, updates, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
     return response.data;
   },
 
-  deleteJob: async (id) => {
-    const response = await api.delete(`/jobs/${id}`);
+  deleteJob: async (token, jobId) => {
+    const response = await api.delete(`/jobs/${jobId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
     return response.data;
   },
 
-  parseJobUrl: async (url) => {
-    const response = await api.post('/jobs/parse-url', { url });
+  parseJobUrl: async (token, url) => {
+    const response = await api.post('/jobs/parse-url', { url }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
     return response.data;
   }
 };

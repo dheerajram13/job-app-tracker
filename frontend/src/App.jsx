@@ -1,68 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+import Dashboard from './components/dashboard/Dashboard';
+import Login from './components/auth/Login';
+import Loading from './components/common/Loading';
 import Navbar from './components/layout/Navbar';
-import JobCard from './components/jobs/JobCard';
 import JobForm from './components/jobs/JobForm';
-import { jobService } from './services/api';
 
 function App() {
-  const [jobs, setJobs] = useState([]);
+  const { isLoading, isAuthenticated, error } = useAuth0();
   const [showJobForm, setShowJobForm] = useState(false);
 
-  useEffect(() => {
-    fetchJobs();
-  }, []);
+  if (error) {
+    return <div>Authentication Error: {error.message}</div>;
+  }
 
-  const fetchJobs = async () => {
-    try {
-      const data = await jobService.getAllJobs();
-      setJobs(data);
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-    }
-  };
-
-  const handleJobSubmit = async (jobData) => {
-    try {
-      await jobService.createJob(jobData);
-      setShowJobForm(false);
-      fetchJobs();
-    } catch (error) {
-      console.error('Error creating job:', error);
-    }
-  };
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Job Applications</h2>
-            <button
-              onClick={() => setShowJobForm(true)}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-            >
-              Add New Job
-            </button>
-          </div>
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        {isAuthenticated && <Navbar onAddClick={() => setShowJobForm(true)} />}
+        
+        <div className="py-6">
+          <Routes>
+            <Route
+              path="/login"
+              element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />}
+            />
+            <Route
+              path="/dashboard/*"
+              element={
+                isAuthenticated ? (
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <Dashboard />
+                  </div>
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        </div>
 
-          {showJobForm && (
-            <div className="mb-6">
+        {showJobForm && (
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full m-4">
               <JobForm
-                onSubmit={handleJobSubmit}
+                onSubmit={async (formData, token) => {
+                  // Handle job submission
+                  setShowJobForm(false);
+                  // You might want to refresh the dashboard data here
+                }}
                 onClose={() => setShowJobForm(false)}
               />
             </div>
-          )}
-
-          <div className="space-y-4">
-            {jobs.map(job => (
-              <JobCard key={job.id} job={job} />
-            ))}
           </div>
-        </div>
-      </main>
-    </div>
+        )}
+      </div>
+    </Router>
   );
 }
 
