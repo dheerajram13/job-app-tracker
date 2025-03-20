@@ -6,6 +6,7 @@ import Login from './components/auth/Login';
 import Loading from './components/common/Loading';
 import Navbar from './components/layout/Navbar';
 import JobForm from './components/jobs/JobForm';
+import ScrapedJobs from './components/jobs/ScrapedJobs';
 
 function App() {
   const { isLoading, isAuthenticated, error } = useAuth0();
@@ -43,6 +44,18 @@ function App() {
               }
             />
             <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route
+              path="/recommended-jobs"
+              element={
+                isAuthenticated ? (
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <ScrapedJobs />
+                  </div>
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
           </Routes>
         </div>
 

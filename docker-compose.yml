@@ -9,10 +9,10 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/jobtracker
       - REDIS_URL=redis://redis:6379/0
-      - AUTH0_DOMAIN=dev-jfbkac6ro5a1weiq.us.auth0.com
-      - AUTH0_API_AUDIENCE=https://api.jobapptracker.com
-      - AUTH0_CLIENT_ID=fxVS92jJNcmc0eYqoUOLnT77E6MwWQmb
-      - AUTH0_CLIENT_SECRET=dvlvN9SBywNcb87Micfxr1xW4uJJbxriXm2TvFEBvvL9DdmhX7frA2Kjnv15AZCp
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - AUTH0_API_AUDIENCE=${AUTH0_API_AUDIENCE}
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
       - ALLOWED_ORIGINS=http://localhost:3000
     depends_on:
       db:
@@ -32,9 +32,9 @@ services:
       - "3000:3000"
     environment:
       - VITE_API_URL=http://localhost:8000/api
-      - VITE_AUTH0_DOMAIN=dev-jfbkac6ro5a1weiq.us.auth0.com
-      - VITE_AUTH0_CLIENT_ID=fxVS92jJNcmc0eYqoUOLnT77E6MwWQmb
-      - VITE_AUTH0_AUDIENCE=https://api.jobapptracker.com
+      - VITE_AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - VITE_AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - VITE_AUTH0_AUDIENCE=${AUTH0_API_AUDIENCE}
     networks:
       - app-network
     volumes:
@@ -82,4 +82,4 @@ networks:
 volumes:
   postgres_data:
   redis_data:
-  transformer_cache:  #
+  transformer_cache:
