@@ -6,6 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     python3-dev \
+    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -20,5 +21,9 @@ RUN pip install --no-cache-dir spacy && \
 # Copy application code
 COPY . .
 
+# Make the start script executable
+COPY start.sh .
+RUN chmod +x start.sh
+
 # Command to run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./start.sh"]

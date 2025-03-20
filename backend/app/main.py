@@ -8,6 +8,8 @@ from fastapi.security import OAuth2PasswordBearer
 from app.database import SessionLocal, engine
 from app.models import job, user, resume
 from app.services.job_parser import job_parser
+from app.services.job_scraper import JobSpyScraper, start_job_scraping
+from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, or_
 from pydantic import BaseModel, HttpUrl
@@ -18,6 +20,7 @@ import base64
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
+
 
 # Enhanced logging configuration
 logging.basicConfig(
@@ -368,3 +371,110 @@ async def health_check():
         "timestamp": datetime.utcnow(),
         "version": "2.0.0"
     }
+
+
+# Scrape jobs endpoint
+@app.post("/api/jobs/scrape")
+async def scrape_jobs(
+    request: dict,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: Dict = Depends(get_current_user)
+):
+    """Trigger job scraping for specified search terms"""
+    search_terms = request.get("search_terms", [])
+    location = request.get("location", "Australia")
+    
+    return start_job_scraping(
+        background_tasks=background_tasks,
+        search_terms=search_terms,
+        db=db,
+        location=location
+    )
+
+# Get scraped jobs endpoint
+@app.get("/api/jobs/scraped")
+async def get_scraped_jobs(
+    search_query: Optional[str] = None,
+    min_relevance: Optional[float] = Query(None, ge=0, le=100),
+    skills: Optional[str] = None,
+    applied: Optional[bool] = None,
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    db: Session = Depends(get_db),
+    current_user: Dict = Depends(get_current_user)
+):
+    """Get scraped jobs with optional filtering"""
+    scraper = JobSpyScraper()
+    
+    # Parse skills if provided
+    skills_list = None
+    if skills:
+        skills_list = [s.strip() for s in skills.split(',')]
+    
+    jobs, total = scraper.get_scraped_jobs(
+        db=db,
+        search_query=search_query,
+        min_relevance=min_relevance,
+        skills=skills_list,
+        applied=applied,
+        limit=limit,
+        offset=offset
+    )
+    
+    # Format response
+    job_results = []
+    for job in jobs:
+        skills_array = job.skills.split(',') if job.skills else []
+        job_results.append({
+            "id": job.id,
+            "title": job.title,
+            "company": job.company,
+            "location": job.location,
+            "description": job.description,
+            "url": job.url,
+            "status": job.status,
+            "date_applied": job.date_applied.isoformat() if job.date_applied else None,
+            "skills": skills_array,
+            "relevance_score": job.relevance_score,
+            "search_query": job.search_query,
+            "applied": job.status == "Applied"
+        })
+    
+    return {
+        "jobs": job_results,
+        "total": total,
+        "limit": limit,
+        "offset": offset
+    }
+
+# Mark job as applied
+@app.post("/api/jobs/scraped/{job_id}/apply")
+async def mark_job_applied(
+    job_id: int,
+    db: Session = Depends(get_db),
+    current_user: Dict = Depends(get_current_user)
+):
+    """Mark a scraped job as applied"""
+    job = db.query(Job).filter(Job.id == job_id).first()
+    
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    job.status = "Applied"
+    db.commit()
+    
+    return {"message": f"Job {job_id} marked as applied"}
+
+# Get top skills
+@app.get("/api/jobs/top-skills")
+async def get_top_skills(
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: Dict = Depends(get_current_user)
+):
+    """Get the most common skills from scraped jobs"""
+    scraper = JobSpyScraper()
+    skills = scraper.get_top_skills(db, limit)
+    
+    return {"skills": skills}

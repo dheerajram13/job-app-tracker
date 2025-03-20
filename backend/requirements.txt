@@ -5,6 +5,7 @@ python-multipart==0.0.6
 httpx==0.25.1
 
 # Database
+alembic==1.12.0
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
 redis==5.0.1
@@ -25,3 +26,8 @@ python-dotenv==1.0.0
 python-jose[cryptography]==3.3.0
 PyJWT[crypto]==2.8.0
 cryptography==41.0.5
+
+# Job Scrape
+python-jobspy==1.1.78
+nltk==3.8.1
+schedule==1.2.0

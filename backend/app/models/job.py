@@ -28,7 +28,11 @@ class Job(Base):
     salary_range = Column(String(100), nullable=True)
     user_id = Column(String(255), ForeignKey("users.id"), nullable=True)
     resume_id = Column(Integer, ForeignKey("resumes.id"), nullable=True)
-    
+    relevance_score = Column(Float, default=0.0)
+    skills = Column(Text, nullable=True)
+    is_scraped = Column(Boolean, default=False)
+    search_query = Column(String(255), nullable=True)
+        
     # Define the relationships
     user = relationship("User", back_populates="jobs")
     resume = relationship("Resume", back_populates="jobs")
