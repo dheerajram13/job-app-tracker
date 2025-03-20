@@ -9,12 +9,12 @@ from app.database import SessionLocal, engine
 from app.models import job, user, resume
 from app.services.job_parser import job_parser
 from app.services.job_scraper import JobSpyScraper, start_job_scraping
-from fastapi import BackgroundTasks
+from fastapi import BackgroundTasks, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, or_
 from pydantic import BaseModel, HttpUrl
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict
 import os
 import base64
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
@@ -372,6 +372,13 @@ async def health_check():
         "version": "2.0.0"
     }
 
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    """
+    Get current user data from the verified token.
+    This is a wrapper around verify_token that provides a consistent interface
+    for endpoints that need the current user.
+    """
+    return await verify_token(token)
 
 # Scrape jobs endpoint
 @app.post("/api/jobs/scrape")
