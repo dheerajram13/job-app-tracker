@@ -455,30 +455,74 @@ async def get_scraped_jobs(
         "offset": offset
     }
 
-# Mark job as applied
-@app.post("/api/jobs/scraped/{job_id}/apply")
-async def mark_job_applied(
-    job_id: int,
+@app.get("/api/jobs/scraped")
+async def get_scraped_jobs(
+    search_query: Optional[str] = Query(None, description="Text to search for in job title or description"),
+    min_relevance: Optional[float] = Query(None, description="Minimum relevance score"),
+    skills: Optional[str] = Query(None, description="Comma-separated skills to filter by"),
+    applied: Optional[bool] = Query(None, description="Filter for applied jobs"),
+    limit: Optional[int] = Query(50, description="Number of jobs to return"),
+    offset: Optional[int] = Query(0, description="Number of jobs to skip"),
     db: Session = Depends(get_db),
-    current_user: Dict = Depends(get_current_user)
+    current_user: Optional[Dict] = Depends(get_current_user)
 ):
-    """Mark a scraped job as applied"""
-    job = db.query(Job).filter(Job.id == job_id).first()
+    """Get scraped jobs with optional filtering"""
+    scraper = JobSpyScraper()
     
-    if not job:
-        raise HTTPException(status_code=404, detail="Job not found")
+    # Parse skills if provided
+    skills_list = None
+    if skills:
+        skills_list = [s.strip() for s in skills.split(',')]
     
-    job.status = "Applied"
-    db.commit()
+    # Ensure min_relevance is a float if provided
+    min_relevance_float = float(min_relevance) if min_relevance is not None else None
     
-    return {"message": f"Job {job_id} marked as applied"}
+    # Ensure limit and offset are integers
+    limit_int = int(limit) if limit is not None else 50
+    offset_int = int(offset) if offset is not None else 0
+    
+    jobs, total = scraper.get_scraped_jobs(
+        db=db,
+        search_query=search_query,
+        min_relevance=min_relevance_float,
+        skills=skills_list,
+        applied=applied,
+        limit=limit_int,
+        offset=offset_int
+    )
+    
+    # Format response
+    job_results = []
+    for job_item in jobs:
+        skills_array = job_item.skills.split(',') if job_item.skills else []
+        job_results.append({
+            "id": job_item.id,
+            "title": job_item.title,
+            "company": job_item.company,
+            "location": job_item.location if hasattr(job_item, "location") else None,
+            "description": job_item.description,
+            "url": job_item.url,
+            "status": job_item.status,
+            "date_applied": job_item.date_applied.isoformat() if job_item.date_applied else None,
+            "skills": skills_array,
+            "relevance_score": getattr(job_item, "relevance_score", None),
+            "search_query": getattr(job_item, "search_query", None),
+            "applied": job_item.status == "Applied"
+        })
+    
+    return {
+        "jobs": job_results,
+        "total": total,
+        "limit": limit_int,
+        "offset": offset_int
+    }
 
 # Get top skills
 @app.get("/api/jobs/top-skills")
 async def get_top_skills(
-    limit: int = Query(20, ge=1, le=100),
+    limit: Optional[int] = Query(20, description="Number of skills to return"),
     db: Session = Depends(get_db),
-    current_user: Dict = Depends(get_current_user)
+    current_user: Optional[Dict] = Depends(get_current_user)
 ):
     """Get the most common skills from scraped jobs"""
     scraper = JobSpyScraper()
