@@ -2,25 +2,26 @@ import logging
 import jwt
 import json
 import requests
-from fastapi import FastAPI, HTTPException, Depends, Request
+import uuid
+from fastapi import FastAPI, HTTPException, Depends, Request, BackgroundTasks, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from app.database import SessionLocal, engine
 from app.models import job, user, resume
 from app.services.job_parser import job_parser
-from app.services.job_scraper import JobSpyScraper, start_job_scraping
-from fastapi import BackgroundTasks, Query
+from app.services.job_scraper import JobSearchParams, job_scraper_service, job_scraper_background
+from app.tasks.job_scraper import scrape_jobs_task
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, or_
+from sqlalchemy import desc, or_, func
 from pydantic import BaseModel, HttpUrl
 from datetime import datetime
 from typing import List, Optional, Dict
 import os
 import base64
+import asyncio
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-
 
 # Enhanced logging configuration
 logging.basicConfig(
@@ -55,6 +56,14 @@ class JobUpdate(BaseModel):
 
 class URLRequest(BaseModel):
     url: str
+
+class ScrapeRequest(BaseModel):
+    search_terms: List[str]
+    location: Optional[str] = "Australia"
+    num_jobs: Optional[int] = 30
+    sites: Optional[List[str]] = None
+    hours_old: Optional[int] = None
+    fetch_description: Optional[bool] = False
 
 app = FastAPI(title="Job Application Tracker API", version="2.0.0")
 
@@ -104,17 +113,14 @@ JWKS_CACHE = {}
 
 async def get_public_key(token):
     try:
-        # Get the Key ID from the token header
         token_header = jwt.get_unverified_header(token)
         kid = token_header.get('kid')
         
-        # If we don't have the key in cache or it's a different key, fetch it
         if kid not in JWKS_CACHE:
             logger.info(f"Fetching JWKS from Auth0 for kid: {kid}")
             jwks_url = f'https://{AUTH0_DOMAIN}/.well-known/jwks.json'
             jwks = requests.get(jwks_url).json()
             
-            # Find the signing key in JWKS
             signing_key = None
             for key in jwks['keys']:
                 if key['kid'] == kid:
@@ -122,7 +128,6 @@ async def get_public_key(token):
                     break
             
             if signing_key:
-                # Convert the JWKS key to PEM format
                 public_key = get_public_key_from_jwk(signing_key)
                 JWKS_CACHE[kid] = public_key
             else:
@@ -135,13 +140,18 @@ async def get_public_key(token):
 
 async def verify_token(token: str = Depends(oauth2_scheme)):
     try:
-        # Log the token (first few characters)
-        logger.info(f"Verifying token: {token[:10]}...")
+        logger.debug(f"Verifying token: {token[:10]}... (length: {len(token)})")
+        logger.debug(f"Using AUTH0_DOMAIN: {AUTH0_DOMAIN}, AUTH0_API_AUDIENCE: {AUTH0_API_AUDIENCE}")
         
-        # Get the public key
+        # Get the token header to extract kid
+        token_header = jwt.get_unverified_header(token)
+        logger.debug(f"Token header: {token_header}")
+        
+        # Get public key
         public_key = await get_public_key(token)
+        logger.debug(f"Retrieved public key for kid: {token_header.get('kid')}")
         
-        # Verify the token
+        # Decode and verify token
         payload = jwt.decode(
             token,
             key=public_key,
@@ -151,19 +161,23 @@ async def verify_token(token: str = Depends(oauth2_scheme)):
         )
         
         logger.info("Token verified successfully")
+        logger.debug(f"Token payload: {payload}")
         return payload
         
-    except jwt.ExpiredSignatureError:
-        logger.error("Token has expired")
+    except jwt.ExpiredSignatureError as e:
+        logger.error(f"Token verification failed: Expired signature - {str(e)}")
         raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.JWTClaimsError as e:
-        logger.error(f"Invalid claims: {str(e)}")
-        raise HTTPException(status_code=401, detail="Invalid token claims")
-    except jwt.JWTError as e:
-        logger.error(f"JWT error: {str(e)}")
+    except jwt.InvalidAudienceError as e:
+        logger.error(f"Token verification failed: Invalid audience - {str(e)}")
+        raise HTTPException(status_code=401, detail="Invalid audience")
+    except jwt.InvalidIssuerError as e:
+        logger.error(f"Token verification failed: Invalid issuer - {str(e)}")
+        raise HTTPException(status_code=401, detail="Invalid issuer")
+    except jwt.InvalidTokenError as e:
+        logger.error(f"Token verification failed: Invalid token - {str(e)}")
         raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
-        logger.error(f"Token verification error: {str(e)}")
+        logger.error(f"Token verification failed: Unexpected error - {str(e)}", exc_info=True)
         raise HTTPException(status_code=401, detail="Token verification failed")
 
 # Database dependency
@@ -187,27 +201,22 @@ async def log_requests(request: Request, call_next):
     logger.info(f"Response status: {response.status_code}")
     return response
 
-# Update the create_job endpoint in main.py
-
 @app.post("/api/jobs/")
 async def create_job(job_data: dict, db: Session = Depends(get_db)):
     try:
-        # If user_id is provided, check if user exists
         if user_id := job_data.get("user_id"):
             existing_user = db.query(user.User).filter(user.User.id == user_id).first()
             
             if not existing_user:
-                # Create new user if doesn't exist
                 new_user = user.User(
-                    id=user_id,  # Using the OAuth ID as user ID
-                    email=job_data.get("user_email", ""),  # Add user email if available
-                    full_name=job_data.get("user_name", "")  # Add user name if available
+                    id=user_id,
+                    email=job_data.get("user_email", ""),
+                    full_name=job_data.get("user_name", "")
                 )
                 db.add(new_user)
                 db.commit()
                 db.refresh(new_user)
         
-        # Create the job
         db_job = job.Job(
             title=job_data.get("title"),
             company=job_data.get("company"),
@@ -216,7 +225,7 @@ async def create_job(job_data: dict, db: Session = Depends(get_db)):
             status=job_data.get("status", "Applied"),
             notes=job_data.get("notes", ""),
             date_applied=datetime.utcnow(),
-            user_id=user_id if user_id else None  # Make user_id optional
+            user_id=user_id if user_id else None
         )
         
         db.add(db_job)
@@ -230,54 +239,24 @@ async def create_job(job_data: dict, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/jobs/")
-async def get_jobs(
-    status: Optional[str] = None,
-    search: Optional[str] = None,
-    sortBy: Optional[str] = "dateApplied",
-    db: Session = Depends(get_db)
-):
-    query = db.query(job.Job)
-
-    # Filter by status if provided and not 'all'
-    if status and status.lower() != 'all':
-        query = query.filter(job.Job.status == status)
-
-    # Handle search
-    if search:
-        search_filter = or_(
-            job.Job.title.ilike(f"%{search}%"),
-            job.Job.company.ilike(f"%{search}%"),
-            job.Job.description.ilike(f"%{search}%")
-        )
-        query = query.filter(search_filter)
-
-    # Handle sorting
-    if sortBy == "dateApplied":
-        query = query.order_by(desc(job.Job.date_applied))
-    elif sortBy == "company":
-        query = query.order_by(job.Job.company)
-    elif sortBy == "title":
-        query = query.order_by(job.Job.title)
-    elif sortBy == "status":
-        query = query.order_by(job.Job.status)
-
-    jobs = query.all()
-    formatted_jobs = []
+async def get_jobs(db: Session = Depends(get_db)):
+    jobs = db.query(job.Job).all()
+    
+    result = []
     for j in jobs:
-        job_dict = {
+        job_data = {
             "id": j.id,
             "title": j.title,
             "company": j.company,
             "description": j.description,
             "url": j.url,
             "status": j.status,
-            "dateApplied": j.date_applied.isoformat(),
-            "notes": j.notes,
-            "user_id": j.user_id
+            "dateApplied": j.date_applied.isoformat() if j.date_applied else None,
+            "notes": j.notes
         }
-        formatted_jobs.append(job_dict)
-
-    return formatted_jobs
+        result.append(job_data)
+        
+    return result
 
 @app.get("/api/jobs/{job_id}")
 async def get_job(
@@ -324,17 +303,14 @@ async def delete_job(job_id: int, db: Session = Depends(get_db)):
     try:
         logger.info(f"Attempting to delete job with ID: {job_id}")
         
-        # Try to fetch the job first
         db_job = db.query(job.Job).filter(job.Job.id == job_id).first()
         
-        # Log the query result
         if db_job:
             logger.info(f"Found job to delete: {db_job.title} at {db_job.company}")
         else:
             logger.warning(f"No job found with ID: {job_id}")
             raise HTTPException(status_code=404, detail=f"Job with ID {job_id} not found")
         
-        # Perform the deletion
         db.delete(db_job)
         db.commit()
         
@@ -346,7 +322,6 @@ async def delete_job(job_id: int, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error deleting job: {str(e)}")
 
-# URL parsing endpoint
 @app.post("/api/jobs/parse-url")
 async def parse_job_url(
     request_data: URLRequest,
@@ -363,7 +338,6 @@ async def parse_job_url(
         logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-# Health check endpoint
 @app.get("/api/health")
 async def health_check():
     return {
@@ -373,159 +347,241 @@ async def health_check():
     }
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    """
-    Get current user data from the verified token.
-    This is a wrapper around verify_token that provides a consistent interface
-    for endpoints that need the current user.
-    """
     return await verify_token(token)
 
-# Scrape jobs endpoint
+# Job scraping routes
 @app.post("/api/jobs/scrape")
 async def scrape_jobs(
-    request: dict,
-    background_tasks: BackgroundTasks,
+    request: ScrapeRequest,
     db: Session = Depends(get_db),
-    current_user: Dict = Depends(get_current_user)
+    user_data: dict = Depends(verify_token)
 ):
     """Trigger job scraping for specified search terms"""
-    search_terms = request.get("search_terms", [])
-    location = request.get("location", "Australia")
-    
-    return start_job_scraping(
-        background_tasks=background_tasks,
-        search_terms=search_terms,
-        db=db,
-        location=location
-    )
+    try:
+        task_ids = []
+        for search_term in request.search_terms:
+            # Handle site_name parameter - it can be a single string or a list
+            site_name = request.sites
+            if isinstance(site_name, str):
+                site_name = [site_name]
+            
+            params = JobSearchParams(
+                search_term=search_term,
+                location=request.location,
+                num_jobs=request.num_jobs,
+                site_name=site_name,
+                hours_old=request.hours_old,
+                fetch_description=request.fetch_description,
+                sort_order="desc",
+                country_code="au"
+            )
+            
+            logger.info(f"Starting job scraping task for: {search_term} on sites: {site_name}")
+            
+            # Convert params to dict for Celery
+            params_dict = params.dict()
+            
+            # Start the Celery task
+            task = scrape_jobs_task.delay(str(uuid.uuid4()), params_dict)
+            task_ids.append(task.id)
+        
+        return {
+            "task_ids": task_ids,
+            "status": "processing",
+            "message": f"Started job scraping for {len(request.search_terms)} search terms"
+        }
+    except Exception as e:
+        logger.error(f"Error starting job scraping: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-# Get scraped jobs endpoint
-@app.get("/api/jobs/scraped")
-async def get_scraped_jobs(
-    search_query: Optional[str] = None,
-    min_relevance: Optional[float] = Query(None, ge=0, le=100),
-    skills: Optional[str] = None,
-    applied: Optional[bool] = None,
-    limit: int = Query(50, ge=1, le=100),
-    offset: int = Query(0, ge=0),
+@app.get("/api/jobs/scrape/{task_id}")
+async def get_scraped_jobs(task_id: str):
+    """Get the results of a job scraping task"""
+    task_status = job_scraper_background.get_task_status(task_id)
+    
+    if task_status["status"] == "not_found":
+        raise HTTPException(status_code=404, detail="Task not found")
+        
+    return task_status
+
+@app.post("/api/jobs/add-scraped")
+async def add_scraped_job(
+    job_data: dict,
     db: Session = Depends(get_db),
-    current_user: Dict = Depends(get_current_user)
+    user_data: dict = Depends(verify_token)
 ):
-    """Get scraped jobs with optional filtering"""
-    scraper = JobSpyScraper()
+    """Add a scraped job to the database"""
+    try:
+        user_id = user_data.get("sub")
+        existing_user = db.query(user.User).filter(user.User.id == user_id).first()
+        
+        if not existing_user:
+            new_user = user.User(
+                id=user_id,
+                email=user_data.get("email", ""),
+                full_name=user_data.get("name", "")
+            )
+            db.add(new_user)
+            db.commit()
+            db.refresh(new_user)
+        
+        db_job = job.Job(
+            title=job_data.get("title"),
+            company=job_data.get("company"),
+            description=job_data.get("description", job_data.get("detailed_description", "")),
+            url=job_data.get("url", ""),
+            status="Bookmarked",
+            notes=f"Source: {job_data.get('source', 'Job Board')}\nLocation: {job_data.get('location', 'Not specified')}",
+            date_applied=None,
+            user_id=user_id,
+            location=job_data.get("location", "")
+        )
+        db.add(db_job)
+        db.commit()
+        db.refresh(db_job)
+        return db_job
+    except Exception as e:
+        logger.error(f"Error adding scraped job: {str(e)}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/jobs/advanced-search")
+async def advanced_search(
+    params: dict,
+    background_tasks: BackgroundTasks,
+    user_data: dict = Depends(verify_token)
+):
+    """Enhanced job search with multiple parameters"""
+    task_id = str(uuid.uuid4())
     
-    # Parse skills if provided
-    skills_list = None
-    if skills:
-        skills_list = [s.strip() for s in skills.split(',')]
-    
-    jobs, total = scraper.get_scraped_jobs(
-        db=db,
-        search_query=search_query,
-        min_relevance=min_relevance,
-        skills=skills_list,
-        applied=applied,
-        limit=limit,
-        offset=offset
+    search_params = JobSearchParams(
+        search_term=params.get("search_term", ""),
+        location=params.get("location", "Australia"),
+        site_name=params.get("sites", None),
+        num_jobs=params.get("num_jobs", 50),
+        sort_order=params.get("sort_order", "desc"),
+        fetch_description=params.get("fetch_description", False),
+        use_proxies=params.get("use_proxies", False),
+        hours_old=params.get("hours_old", None)
     )
     
-    # Format response
-    job_results = []
-    for job in jobs:
-        skills_array = job.skills.split(',') if job.skills else []
-        job_results.append({
-            "id": job.id,
-            "title": job.title,
-            "company": job.company,
-            "location": job.location,
-            "description": job.description,
-            "url": job.url,
-            "status": job.status,
-            "date_applied": job.date_applied.isoformat() if job.date_applied else None,
-            "skills": skills_array,
-            "relevance_score": job.relevance_score,
-            "search_query": job.search_query,
-            "applied": job.status == "Applied"
-        })
+    logger.info(f"Received advanced job search request: {search_params.search_term}")
+    
+    background_tasks.add_task(
+        job_scraper_background.start_job_search,
+        task_id=task_id,
+        params=search_params
+    )
     
     return {
-        "jobs": job_results,
-        "total": total,
-        "limit": limit,
-        "offset": offset
+        "task_id": task_id,
+        "status": "processing",
+        "message": f"Started advanced job search for '{search_params.search_term}'"
     }
 
 @app.get("/api/jobs/scraped")
 async def get_scraped_jobs(
-    search_query: Optional[str] = Query(None, description="Text to search for in job title or description"),
-    min_relevance: Optional[float] = Query(None, description="Minimum relevance score"),
-    skills: Optional[str] = Query(None, description="Comma-separated skills to filter by"),
-    applied: Optional[bool] = Query(None, description="Filter for applied jobs"),
-    limit: Optional[int] = Query(50, description="Number of jobs to return"),
-    offset: Optional[int] = Query(0, description="Number of jobs to skip"),
+    search_query: Optional[str] = Query(None, description="Filter by job title, company, or description"),
+    min_relevance: Optional[float] = Query(None, ge=0, le=1, description="Minimum relevance score (0-1)"),
+    skills: Optional[str] = Query(None, description="Comma-separated list of required skills"),
+    applied: Optional[bool] = Query(None, description="Filter by application status"),
+    limit: int = Query(50, ge=1, le=100, description="Number of results to return"),
+    offset: int = Query(0, ge=0, description="Number of results to skip"),
     db: Session = Depends(get_db),
-    current_user: Optional[Dict] = Depends(get_current_user)
+    user_data: dict = Depends(verify_token)
 ):
-    """Get scraped jobs with optional filtering"""
-    scraper = JobSpyScraper()
-    
-    # Parse skills if provided
-    skills_list = None
-    if skills:
-        skills_list = [s.strip() for s in skills.split(',')]
-    
-    # Ensure min_relevance is a float if provided
-    min_relevance_float = float(min_relevance) if min_relevance is not None else None
-    
-    # Ensure limit and offset are integers
-    limit_int = int(limit) if limit is not None else 50
-    offset_int = int(offset) if offset is not None else 0
-    
-    jobs, total = scraper.get_scraped_jobs(
-        db=db,
-        search_query=search_query,
-        min_relevance=min_relevance_float,
-        skills=skills_list,
-        applied=applied,
-        limit=limit_int,
-        offset=offset_int
-    )
-    
-    # Format response
-    job_results = []
-    for job_item in jobs:
-        skills_array = job_item.skills.split(',') if job_item.skills else []
-        job_results.append({
-            "id": job_item.id,
-            "title": job_item.title,
-            "company": job_item.company,
-            "location": job_item.location if hasattr(job_item, "location") else None,
-            "description": job_item.description,
-            "url": job_item.url,
-            "status": job_item.status,
-            "date_applied": job_item.date_applied.isoformat() if job_item.date_applied else None,
-            "skills": skills_array,
-            "relevance_score": getattr(job_item, "relevance_score", None),
-            "search_query": getattr(job_item, "search_query", None),
-            "applied": job_item.status == "Applied"
-        })
-    
-    return {
-        "jobs": job_results,
-        "total": total,
-        "limit": limit_int,
-        "offset": offset_int
-    }
+    """Get scraped jobs with filtering options"""
+    try:
+        user_id = user_data.get("sub")
+        query = db.query(job.Job).filter(job.Job.user_id == user_id)
+        
+        if applied is not None:
+            query = query.filter(job.Job.status == ("Applied" if applied else "Bookmarked"))
+        
+        if search_query:
+            search_filter = or_(
+                job.Job.title.ilike(f"%{search_query}%"),
+                job.Job.company.ilike(f"%{search_query}%"),
+                job.Job.description.ilike(f"%{search_query}%")
+            )
+            query = query.filter(search_filter)
+        
+        if skills:
+            skills_list = [s.strip().lower() for s in skills.split(',')]
+            for skill in skills_list:
+                query = query.filter(job.Job.description.ilike(f"%{skill}%"))
+        
+        total = query.count()
+        jobs = query.order_by(desc(job.Job.date_applied)).offset(offset).limit(limit).all()
+        
+        results = []
+        for job_item in jobs:
+            skills_list = []
+            if job_item.description and skills:
+                for skill in skills_list:
+                    if skill.lower() in job_item.description.lower():
+                        skills_list.append(skill)
+            
+            date_applied = job_item.date_applied.isoformat() if job_item.date_applied else None
+            
+            job_details = {
+                "id": job_item.id,
+                "title": job_item.title,
+                "company": job_item.company,
+                "description": job_item.description,
+                "url": job_item.url,
+                "status": job_item.status,
+                "location": job_item.location,
+                "skills": skills_list,
+                "job_type": None,  # Not stored in DB, can be extracted from description if needed
+                "salary_range": job_item.salary_range,
+                "date_applied": date_applied,
+                "date_scraped": None,  # Not stored in DB, can be added as a field if needed
+                "relevance_score": 1.0 if min_relevance is None else min_relevance,  # Placeholder
+                "search_query": search_query,
+                "applied": job_item.status == "Applied"
+            }
+            results.append(job_details)
+        
+        return {
+            "jobs": results,
+            "total": total,
+            "limit": limit,
+            "offset": offset
+        }
+    except Exception as e:
+        logger.error(f"Error getting scraped jobs: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-# Get top skills
 @app.get("/api/jobs/top-skills")
 async def get_top_skills(
-    limit: Optional[int] = Query(20, description="Number of skills to return"),
+    limit: int = Query(20, ge=1, le=100, description="Number of skills to return"),
     db: Session = Depends(get_db),
-    current_user: Optional[Dict] = Depends(get_current_user)
+    user_data: dict = Depends(verify_token)
 ):
-    """Get the most common skills from scraped jobs"""
-    scraper = JobSpyScraper()
-    skills = scraper.get_top_skills(db, limit)
-    
-    return {"skills": skills}
+    """Get the top skills from all scraped jobs"""
+    try:
+        user_id = user_data.get("sub")
+        # Common skills to look for (can be expanded based on your needs)
+        common_skills = [
+            "python", "javascript", "java", "sql", "aws", "docker", "kubernetes",
+            "react", "node.js", "typescript", "git", "linux", "agile", "scrum",
+            "machine learning", "data analysis", "cloud computing", "devops"
+        ]
+        
+        # Count occurrences of each skill in job descriptions
+        skill_counts = []
+        for skill in common_skills:
+            count = db.query(job.Job).filter(
+                job.Job.user_id == user_id,
+                job.Job.description.ilike(f"%{skill}%")
+            ).count()
+            if count > 0:
+                skill_counts.append({"skill": skill, "count": count})
+        
+        # Sort by count and limit results
+        skill_counts.sort(key=lambda x: x["count"], reverse=True)
+        return {"skills": skill_counts[:limit]}
+    except Exception as e:
+        logger.error(f"Error getting top skills: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

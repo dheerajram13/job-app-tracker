@@ -7,6 +7,7 @@ import Loading from './components/common/Loading';
 import Navbar from './components/layout/Navbar';
 import JobForm from './components/jobs/JobForm';
 import ScrapedJobs from './components/jobs/ScrapedJobs';
+import { ApiWrapper } from './components/api/ApiWrapper';
 
 function App() {
   const { isLoading, isAuthenticated, error } = useAuth0();
@@ -16,8 +17,19 @@ function App() {
     return <div>Authentication Error: {error.message}</div>;
   }
 
+  // Handle Auth0 loading state
   if (isLoading) {
+    // Don't show loading screen during token refresh
+    if (localStorage.getItem('auth0_token_refresh')) {
+      return <div className="min-h-screen bg-gray-50" />;
+    }
+    // Show loading screen during initial authentication
     return <Loading />;
+  }
+
+  // Set flag for token refresh
+  if (isAuthenticated) {
+    localStorage.setItem('auth0_token_refresh', 'true');
   }
 
   return (
@@ -35,9 +47,11 @@ function App() {
               path="/dashboard/*"
               element={
                 isAuthenticated ? (
-                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <Dashboard />
-                  </div>
+                  <ApiWrapper>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                      <Dashboard />
+                    </div>
+                  </ApiWrapper>
                 ) : (
                   <Navigate to="/login" />
                 )

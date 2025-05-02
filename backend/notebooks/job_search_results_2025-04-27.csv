@@ -1,0 +1,177 @@
+id,site,job_url,job_url_direct,title,company,location,date_posted,job_type,salary_source,interval,min_amount,max_amount,currency,is_remote,job_level,job_function,listing_type,emails,description,company_industry,company_url,company_logo,company_url_direct,company_addresses,company_num_employees,company_revenue,company_description,search_role
+gd-1009723322820,glassdoor,https://www.glassdoor.com.au/job-listing/j?jl=1009723322820,,Scientific Software Engineer,Australian Bureau of Meteorology,Australia,2025-04-27,,direct_data,yearly,94563.0,105910.0,AUD,False,,,organic,,"* APS Level 6, Ongoing
+* $94,563 \- $105,910 \+ 15\.4% super
+* All Bureau locations will be considered
+
+
+We are looking for a scientific software engineer to work in Forecast Application Software team, part of the Research to Operations Program (R2O), to develop the Bureau's Graphical Forecast Editor (GFE) and associated software applications.  
+
+Our ideal candidate can logically and creatively solve problems and is passionate about doing a job well. They possess strong analytical skills and a desire to develop their skills further on the job. As a team player they are comfortable working with a diverse team and can communicate their work effectively to non\-experts.  
+
+As a scientific software engineer in the R2O Program, you will join a team of meteorologists and software engineers and will employ best practices in software development, such as version control, automated testing, code reviews and configuration management. The focus of this work is on collaborative development, testing, and documentation of forecast process tools and natural language generation code written in Python and run on a Red Hat Linux platform. While we currently use python 2\.7, we expect to complete upgrading to python 3 within 12 months.  
+
+The tools developed by the team are used by the Bureau’s operational Meteorologists to produce an Australia\-wide gridded database of seven\-day weather forecast information and corresponding text forecasts. This is a great opportunity to work on meaningful software applications for the public good, in a scientific environment with a commitment to innovation and quality.
+
+
+
+Position Description Opens in new window
+
+
+
+Position Description Opens in new window
+
+
+  
+**How to register:**
+--------------------
+
+
+* If you have not registered with our online application system, you can create an account by clicking the ''Begin'' button.
+* Forgotten Your Login Details? click here and follow the steps.
+* Preview Application Form Opens in new window",,https://www.glassdoor.com.au/Overview/W-EI_IE695311.htm,https://media.glassdoor.com/sql/695311/australian-bureau-of-meteorology-squarelogo-1464612967170.png,,,,,,Software Engineer
+gd-1009723322833,glassdoor,https://www.glassdoor.com.au/job-listing/j?jl=1009723322833,,Senior Software Engineer,Australian Bureau of Meteorology,Sydney,2025-04-27,,direct_data,yearly,115443.0,125832.0,AUD,False,,,organic,,"* Executive Level 1, Ongoing
+* $115,443 \- $125,832 \+ 15\.4% super
+* Adelaide, Brisbane, Cairns, Canberra, Darwin, Hobart, Melbourne, Perth, Sydney
+
+
+The Bureau's Science and Innovation Group delivers world\-class research and development enabling the Bureau to deliver better climate, oceans, water, weather and earth system prediction information and insights to its customers. The Research to Operations Program (R2O) is one of two programs within the Science and Innovation Group. It brings science into practice by accelerating the transfer of research into real\-world application. A key focus for R2O is to deliver impact and value for the Bureau's customers by transferring into operations our numerical models and analytic and processing systems that require high\-performance computing and data.  
+
+  
+
+The Observations and Assimilation team is seeking a talented senior scientific software engineer to support its work managing a range of operational data, including satellite observations, and undertaking development for their application in forecasts and other Bureau information products. Our ideal candidate will make contributions to operationalisation and support of new and upgraded software systems for data assimilation and for preparing near\-real\-time global observations from satellite and other sources, for a range of uses including assimilation into operational climate, water and weather forecasting models, developed as part of the Bureau's Research and Development plan 2020\-2030\.  
+
+  
+
+To be successful in the role you will have software engineering and computer science knowledge. You will have the capability to lead the delivery and support of software systems and be a team player. You will have experience in programming systems using Python3, C, and/or C\+\+, with third\-party libraries on high\-performance Linux platforms.
+
+
+  
+**How to register:**
+--------------------
+
+
+* If you have not registered with our online application system, you can create an account by clicking the ''Begin'' button.
+* Forgotten Your Login Details? click here and follow the steps.
+* Preview Application Form Opens in new window",,https://www.glassdoor.com.au/Overview/W-EI_IE695311.htm,https://media.glassdoor.com/sql/695311/australian-bureau-of-meteorology-squarelogo-1464612967170.png,,,,,,Software Engineer
+in-4544a19e6fddefd7,indeed,https://au.indeed.com/viewjob?jk=4544a19e6fddefd7,"https://bomcareers.nga.net.au/cp/index.cfm?event=jobs.checkJobDetailsNewApplication&returnToEvent=jobs.listJobs&jobid=80805CB6-4193-A74E-36C4-E38F6DEBF2E1&CurATC=EXT&CurBID=7B42A027%2D5B8B%2DCC7C%2D26F9%2DD1A55C114271&JobListID=22FC4F47%2DE994%2D46A3%2DB8C9%2D9BC901269F43&jobsListKey=f2e4b8bd%2D8681%2D4211%2D83de%2D774912d3bc2f&persistVariables=CurATC,CurBID,JobListID,jobsListKey,JobID&lid=27646320018&rmuh=C6BB604BED31111FFD1CE92DAE5BFAA8A841B921",Senior Scientific Software Engineer,Australian Government Bureau of Meteorology,"Sydney, NSW, AU",2025-04-27,,,,,,,False,,,,,"* Executive Level 1, Ongoing
+* $115,443 \- $125,832 \+ 15\.4% super
+* Adelaide, Brisbane, Cairns, Canberra, Darwin, Hobart, Melbourne, Perth, Sydney
+
+
+We are looking for a senior scientific software engineer to work in Forecast Application Software team, part of the Research to Operations Program (R2O), to develop the Bureau's Graphical Forecast Editor (GFE) and associated software applications.  
+
+  
+
+Our ideal candidate can logically and creatively solve problems and is passionate about doing a job well. They possess strong analytical skills and a desire to develop their expertise on the job. As a team player they are comfortable working with a diverse team and can communicate their work effectively to non\-experts.  
+
+  
+
+As a senior scientific software engineer in the R2O Program, you will join a team of meteorologists and software engineers and will employ best practices in software development, such as version control, automated testing, code reviews and configuration management. The focus of this work is on collaborative development, testing, and documentation of forecast process tools and natural language generation code written in Python and run on a Red Hat Linux platform. While we currently use python 2\.7, we expect to complete upgrading to python 3 within 12 months.  
+
+  
+
+The tools developed by the team are used by the Bureau’s operational Meteorologists to produce an Australia\-wide gridded database of seven\-day weather forecast information and corresponding text forecasts. This is a great opportunity to work on meaningful software applications for the public good, in a scientific environment with a commitment to innovation and quality.
+
+
+  
+**How to register:**
+--------------------
+
+
+* If you have not registered with our online application system, you can create an account by clicking the ''Begin'' button.
+* Forgotten Your Login Details? click here and follow the steps.
+* Preview Application Form Opens in new window",Government,https://au.indeed.com/cmp/Australian-Government-Bureau-of-Meteorology,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/fc6a02282a9622e80b12d1c5a45c4f40,http://www.bom.gov.au/,Darwin,"1,001 to 5,000",,,Software Engineer
+in-e0e45509241f6761,indeed,https://au.indeed.com/viewjob?jk=e0e45509241f6761,"https://bomcareers.nga.net.au/cp/index.cfm?event=jobs.checkJobDetailsNewApplication&returnToEvent=jobs.listJobs&jobid=6BD9D768-6761-F814-45EC-E38F6E5D201E&CurATC=EXT&CurBID=7B42A027%2D5B8B%2DCC7C%2D26F9%2DD1A55C114271&JobListID=22FC4F47%2DE994%2D46A3%2DB8C9%2D9BC901269F43&jobsListKey=f2e4b8bd%2D8681%2D4211%2D83de%2D774912d3bc2f&persistVariables=CurATC,CurBID,JobListID,jobsListKey,JobID&lid=27646320028&rmuh=A0A777CEB0810AB53AC13F354DFF88D293F807D3",Senior Software Engineer,Australian Government Bureau of Meteorology,"Sydney, NSW, AU",2025-04-27,,,,,,,False,,,,,"* Executive Level 1, Ongoing
+* $115,443 \- $125,832 \+ 15\.4% super
+* Adelaide, Brisbane, Cairns, Canberra, Darwin, Hobart, Melbourne, Perth, Sydney
+
+
+The Bureau's Science and Innovation Group delivers world\-class research and development enabling the Bureau to deliver better climate, oceans, water, weather and earth system prediction information and insights to its customers. The Research to Operations Program (R2O) is one of two programs within the Science and Innovation Group. It brings science into practice by accelerating the transfer of research into real\-world application. A key focus for R2O is to deliver impact and value for the Bureau's customers by transferring into operations our numerical models and analytic and processing systems that require high\-performance computing and data.  
+
+  
+
+The Observations and Assimilation team is seeking a talented senior scientific software engineer to support its work managing a range of operational data, including satellite observations, and undertaking development for their application in forecasts and other Bureau information products. Our ideal candidate will make contributions to operationalisation and support of new and upgraded software systems for data assimilation and for preparing near\-real\-time global observations from satellite and other sources, for a range of uses including assimilation into operational climate, water and weather forecasting models, developed as part of the Bureau's Research and Development plan 2020\-2030\.  
+
+  
+
+To be successful in the role you will have software engineering and computer science knowledge. You will have the capability to lead the delivery and support of software systems and be a team player. You will have experience in programming systems using Python3, C, and/or C\+\+, with third\-party libraries on high\-performance Linux platforms.
+
+
+  
+**How to register:**
+--------------------
+
+
+* If you have not registered with our online application system, you can create an account by clicking the ''Begin'' button.
+* Forgotten Your Login Details? click here and follow the steps.
+* Preview Application Form Opens in new window",Government,https://au.indeed.com/cmp/Australian-Government-Bureau-of-Meteorology,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/fc6a02282a9622e80b12d1c5a45c4f40,http://www.bom.gov.au/,Darwin,"1,001 to 5,000",,,Software Engineer
+in-d3add14363ea42ce,indeed,https://au.indeed.com/viewjob?jk=d3add14363ea42ce,"https://bomcareers.nga.net.au/cp/index.cfm?event=jobs.checkJobDetailsNewApplication&returnToEvent=jobs.listJobs&jobid=4BF2BA89-91E7-F67E-6621-DB4E3E914C9A&CurATC=EXT&CurBID=7B42A027%2D5B8B%2DCC7C%2D26F9%2DD1A55C114271&JobListID=22FC4F47%2DE994%2D46A3%2DB8C9%2D9BC901269F43&jobsListKey=f2e4b8bd%2D8681%2D4211%2D83de%2D774912d3bc2f&persistVariables=CurATC,CurBID,JobListID,jobsListKey,JobID&lid=27646320078&rmuh=45F245A2AF82917AB58ACB1D9F16D3FB76188FD4",Scientific Software Engineer,Australian Government Bureau of Meteorology,AU,2025-04-27,,,,,,,False,,,,,"* APS Level 6, Ongoing
+* $94,563 \- $105,910 \+ 15\.4% super
+* All Bureau locations will be considered
+
+
+We are looking for a scientific software engineer to work in Forecast Application Software team, part of the Research to Operations Program (R2O), to develop the Bureau's Graphical Forecast Editor (GFE) and associated software applications.  
+
+Our ideal candidate can logically and creatively solve problems and is passionate about doing a job well. They possess strong analytical skills and a desire to develop their skills further on the job. As a team player they are comfortable working with a diverse team and can communicate their work effectively to non\-experts.  
+
+As a scientific software engineer in the R2O Program, you will join a team of meteorologists and software engineers and will employ best practices in software development, such as version control, automated testing, code reviews and configuration management. The focus of this work is on collaborative development, testing, and documentation of forecast process tools and natural language generation code written in Python and run on a Red Hat Linux platform. While we currently use python 2\.7, we expect to complete upgrading to python 3 within 12 months.  
+
+The tools developed by the team are used by the Bureau’s operational Meteorologists to produce an Australia\-wide gridded database of seven\-day weather forecast information and corresponding text forecasts. This is a great opportunity to work on meaningful software applications for the public good, in a scientific environment with a commitment to innovation and quality.
+
+
+
+Position Description Opens in new window
+
+
+
+Position Description Opens in new window
+
+
+  
+**How to register:**
+--------------------
+
+
+* If you have not registered with our online application system, you can create an account by clicking the ''Begin'' button.
+* Forgotten Your Login Details? click here and follow the steps.
+* Preview Application Form Opens in new window",Government,https://au.indeed.com/cmp/Australian-Government-Bureau-of-Meteorology,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/fc6a02282a9622e80b12d1c5a45c4f40,http://www.bom.gov.au/,Darwin,"1,001 to 5,000",,,Software Engineer
+li-4117948370,linkedin,https://www.linkedin.com/jobs/view/4117948370,,"Software Engineer, Early Career, NetSoft",Google,"Sydney, New South Wales, Australia",2025-04-26,,,,,,,,,,,,,,https://www.linkedin.com/company/google,,,,,,,Software Engineer
+li-4076511091,linkedin,https://www.linkedin.com/jobs/view/4076511091,,Graduate Machine Learning Engineer (Trust & Safety) - 2025 Start (Australia),TikTok,"Sydney, New South Wales, Australia",2025-04-26,,,,,,,,,,,,,,https://www.linkedin.com/company/tiktok,,,,,,,Software Engineer
+li-4092737574,linkedin,https://www.linkedin.com/jobs/view/4092737574,,"Backend Software Engineer, Trust and Safety Engineering (Australia)",TikTok,"Sydney, New South Wales, Australia",2025-04-26,,,,,,,,,,,,,,https://www.linkedin.com/company/tiktok,,,,,,,Software Engineer
+li-4184364325,linkedin,https://www.linkedin.com/jobs/view/4184364325,,Android Engineer,carsales,"Melbourne, Victoria, Australia",2025-04-26,,,,,,,,,,,,,,https://au.linkedin.com/company/carsales.com.au,,,,,,,Software Engineer
+li-4076504604,linkedin,https://www.linkedin.com/jobs/view/4076504604,,Frontend Engineer Intern - 2025 Start,TikTok,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/tiktok,,,,,,,Software Engineer
+li-4159633712,linkedin,https://www.linkedin.com/jobs/view/4159633712,,Fullstack Software Engineer,Marigold,,,,,,,,,,,,,,,,https://www.linkedin.com/company/meet-marigold,,,,,,,Software Engineer
+li-4183733370,linkedin,https://www.linkedin.com/jobs/view/4183733370,,Full Stack Developer,Netwealth - See Wealth Differently (ASX:NWL),"Melbourne, Victoria, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/netwealth-investments-limited,,,,,,,Software Engineer
+li-4181566802,linkedin,https://www.linkedin.com/jobs/view/4181566802,,Software Engineer II,Smartsheet,"Brisbane, Queensland, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/smartsheet-com,,,,,,,Software Engineer
+li-4160675672,linkedin,https://www.linkedin.com/jobs/view/4160675672,,Python Developer,Susquehanna International Group,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/susquehanna-international-group,,,,,,,Software Engineer
+li-4215532521,linkedin,https://www.linkedin.com/jobs/view/4215532521,,Software Engineer,Nomino.ai,"Melbourne, Victoria, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/nomino-ai,,,,,,,Software Engineer
+li-4195403413,linkedin,https://www.linkedin.com/jobs/view/4195403413,,.NET Full Stack Developer,Synechron,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/synechron,,,,,,,Software Engineer
+li-4218480054,linkedin,https://www.linkedin.com/jobs/view/4218480054,,Senior Software Engineer (Typescript/React/Node/AWS),Squiz,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/squiz,,,,,,,Software Engineer
+li-4215660830,linkedin,https://www.linkedin.com/jobs/view/4215660830,,Software Engineer (Angular),DTiQ,"Braeside, Victoria, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/dtiq,,,,,,,Software Engineer
+li-4218453069,linkedin,https://www.linkedin.com/jobs/view/4218453069,,Senior Dotnet Developer,N2S.Global,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/n2sglobal,,,,,,,Software Engineer
+li-4218476458,linkedin,https://www.linkedin.com/jobs/view/4218476458,,Senior Software Engineer (Typescript/React/Node/AWS),Squiz,"Melbourne, Victoria, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/squiz,,,,,,,Software Engineer
+li-4218475596,linkedin,https://www.linkedin.com/jobs/view/4218475596,,Senior Software Engineers (AI Focus) - Typescript/Node/React/AWS,Squiz,"Brisbane, Queensland, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/squiz,,,,,,,Software Engineer
+li-4200862308,linkedin,https://www.linkedin.com/jobs/view/4200862308,,Senior Engineer (Sydney),Westpac Group,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/westpac-group,,,,,,,Software Engineer
+li-3871589109,linkedin,https://www.linkedin.com/jobs/view/3871589109,,Senior Software Engineer,UpGuard,"Melbourne, Victoria, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/upguard,,,,,,,Software Engineer
+li-4218472740,linkedin,https://www.linkedin.com/jobs/view/4218472740,,Team Lead (Hands on Software Engineer) (Typescript/Node/React/AWS),Squiz,"Melbourne, Victoria, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/squiz,,,,,,,Software Engineer
+li-4218452216,linkedin,https://www.linkedin.com/jobs/view/4218452216,,Lead Dotnet Developer,N2S.Global,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/n2sglobal,,,,,,,Software Engineer
+li-4218472736,linkedin,https://www.linkedin.com/jobs/view/4218472736,,Team Lead (Hands on Software Engineer) (Typescript/Node/React/AWS),Squiz,"Brisbane, Queensland, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/squiz,,,,,,,Full Stack Developer
+li-4161450108,linkedin,https://www.linkedin.com/jobs/view/4161450108,,"Senior Full Stack Engineer - South Bank, QLD",Flight Centre Travel Group,"Brisbane, Queensland, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/flight-centre,,,,,,,Full Stack Developer
+li-4218476372,linkedin,https://www.linkedin.com/jobs/view/4218476372,,Team Lead (Hands on Software Engineer) (Typescript/Node/React/AWS),Squiz,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/squiz,,,,,,,Full Stack Developer
+li-4183891892,linkedin,https://www.linkedin.com/jobs/view/4183891892,,V-Associate Architect,WNS,"Docklands, Victoria, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/wns-global-services,,,,,,,Full Stack Developer
+li-4199453377,linkedin,https://www.linkedin.com/jobs/view/4199453377,,Data Scientist-Advanced Analytics,IBM,"No Regrets, Queensland, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/ibm,,,,,,,Machine Learning Engineer
+li-4203311230,linkedin,https://www.linkedin.com/jobs/view/4203311230,,AWS Data Platform Engineer,Synechron,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/synechron,,,,,,,Machine Learning Engineer
+li-4139768354,linkedin,https://www.linkedin.com/jobs/view/4139768354,,Software Engineer,"KBR, Inc.","Alice Springs, Northern Territory, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/kbr-inc,,,,,,,Machine Learning Engineer
+li-4218475558,linkedin,https://www.linkedin.com/jobs/view/4218475558,,Senior Software Engineer,Zepto,,,,,,,,,,,,,,,,https://au.linkedin.com/company/zepto-payments,,,,,,,Machine Learning Engineer
+li-4076504700,linkedin,https://www.linkedin.com/jobs/view/4076504700,,Software Engineer- Media Process Client SDK (C++),TikTok,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/tiktok,,,,,,,Machine Learning Engineer
+li-4118159265,linkedin,https://www.linkedin.com/jobs/view/4118159265,,Lead Software Engineer - Developer Productivity,Deputy,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/deputyapp,,,,,,,Machine Learning Engineer
+li-4119775011,linkedin,https://www.linkedin.com/jobs/view/4119775011,,"Senior Software Engineer, Connex on HP Nonstop",FIS,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://www.linkedin.com/company/fis,,,,,,,Machine Learning Engineer
+li-4184335411,linkedin,https://www.linkedin.com/jobs/view/4184335411,,Automation Test Engineer,UST,"Sydney, New South Wales, Australia",2025-04-26,,,,,,,,,,,,,,https://www.linkedin.com/company/ustglobal,,,,,,,Data Scientist
+li-4218183418,linkedin,https://www.linkedin.com/jobs/view/4218183418,,Digital Livestock Scientist,CSIRO,"Brisbane, Queensland, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/csiro,,,,,,,Data Scientist
+li-4136252350,linkedin,https://www.linkedin.com/jobs/view/4136252350,,Senior Python Developer,Macquarie Group,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/macquariegroup,,,,,,,Data Scientist
+li-4218417092,linkedin,https://www.linkedin.com/jobs/view/4218417092,,Education Researcher,Education Perfect,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://nz.linkedin.com/company/educationperfect,,,,,,,Data Scientist
+li-4218184366,linkedin,https://www.linkedin.com/jobs/view/4218184366,,Digital Livestock Scientist,CSIRO,"Armidale, New South Wales, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/csiro,,,,,,,Data Scientist
+li-4216019587,linkedin,https://www.linkedin.com/jobs/view/4216019587,,Senior DevOps Engineer,KPMG Australia,"Melbourne, Victoria, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/kpmg-australia,,,,,,,Data Scientist
+li-4200861415,linkedin,https://www.linkedin.com/jobs/view/4200861415,,DevOps Engineer (Sydney),Westpac Group,"Sydney, New South Wales, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/westpac-group,,,,,,,Data Scientist
+li-4218475488,linkedin,https://www.linkedin.com/jobs/view/4218475488,,Azure Cloud Engineer,Hays,"Perth, Western Australia, Australia",,,,,,,,,,,,,,,https://uk.linkedin.com/company/hays,,,,,,,Data Scientist
+li-4215521911,linkedin,https://www.linkedin.com/jobs/view/4215521911,,OneIdentity Developer - Perm/Contract - Anywhere In Australia,Hastha Solutions,"Millers Point, New South Wales, Australia",,,,,,,,,,,,,,,https://au.linkedin.com/company/hastha-solutions,,,,,,,Data Scientist Intern

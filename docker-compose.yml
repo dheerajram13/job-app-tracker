@@ -61,19 +61,69 @@ services:
       retries: 5
 
   redis:
-    image: redis:alpine
+    image: redis:6-alpine
     container_name: redis
     ports:
       - "6379:6379"
-    networks:
-      - app-network
     volumes:
       - redis_data:/data
+    networks:
+      - app-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 5
+
+  celery:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: celery
+    command: celery -A app.tasks worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/jobtracker
+      - REDIS_URL=redis://redis:6379/0
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - AUTH0_API_AUDIENCE=${AUTH0_API_AUDIENCE}
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
+      - ALLOWED_ORIGINS=http://localhost:3000
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./backend:/app
+      - transformer_cache:/root/.cache/huggingface
+
+  celery-beat:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: celery-beat
+    command: celery -A app.tasks beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/jobtracker
+      - REDIS_URL=redis://redis:6379/0
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - AUTH0_API_AUDIENCE=${AUTH0_API_AUDIENCE}
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - AUTH0_CLIENT_SECRET=${AUTH0_CLIENT_SECRET}
+      - ALLOWED_ORIGINS=http://localhost:3000
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - ./backend:/app
+      - transformer_cache:/root/.cache/huggingface
 
 networks:
   app-network:

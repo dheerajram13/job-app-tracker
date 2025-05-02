@@ -34,9 +34,10 @@ const Dashboard = () => {
     }
   };
 
-  const handleJobSubmit = async (jobData, token) => {
+  const handleJobSubmit = async (jobData) => {
     try {
-      await jobService.createJob(token, jobData);
+      const token = await getAccessTokenSilently();
+      await jobService.createJob(jobData, token);
       setShowJobForm(false);
       fetchJobs();
     } catch (error) {
@@ -44,10 +45,21 @@ const Dashboard = () => {
     }
   };
 
+  const handleScrapeJobs = async (searchParams) => {
+    try {
+      const token = await getAccessTokenSilently();
+      const data = await jobService.scrapeJobs(searchParams, token);
+      setScrapedJobs(data);
+      setShowScrapedJobs(true);
+    } catch (error) {
+      console.error('Error scraping jobs:', error);
+    }
+  };
+
   const handleStatusChange = async (jobId, newStatus) => {
     try {
       const token = await getAccessTokenSilently();
-      await jobService.updateJob(token, jobId, { status: newStatus });
+      await jobService.updateJob(jobId, { status: newStatus }, token);
       fetchJobs();
     } catch (error) {
       console.error('Error updating job status:', error);
@@ -58,7 +70,7 @@ const Dashboard = () => {
     if (window.confirm('Are you sure you want to delete this job application?')) {
       try {
         const token = await getAccessTokenSilently();
-        await jobService.deleteJob(token, jobId);
+        await jobService.deleteJob(jobId, token);
         fetchJobs();
       } catch (error) {
         console.error('Error deleting job:', error);

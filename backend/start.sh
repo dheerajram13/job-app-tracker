@@ -1,6 +1,19 @@
 #!/bin/bash
 set -e
 
+# Check if we're running as Celery worker
+if [ "$1" = "celery" ]; then
+    echo "Starting Celery worker..."
+    celery -A app.tasks worker --loglevel=info
+    exit 0
+fi
+
+if [ "$1" = "beat" ]; then
+    echo "Starting Celery beat..."
+    celery -A app.tasks beat --loglevel=info
+    exit 0
+fi
+
 # Wait for database to be ready
 echo "Waiting for database to be ready..."
 while ! nc -z db 5432; do
