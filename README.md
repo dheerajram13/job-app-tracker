@@ -844,6 +844,3 @@ If you find this project helpful, please consider:
 
 ---
 
-**Built with ❤️ by [Your Name]**
-
-**Last Updated**: 2025-11-07
