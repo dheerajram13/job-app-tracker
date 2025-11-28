@@ -819,10 +819,6 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - Explain the "why" behind suggestions
 - Approve when satisfied, request changes when needed
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgments
 
 - [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
