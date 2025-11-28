@@ -43,30 +43,27 @@ A full-stack web application for tracking job applications with intelligent job 
 - **Containerized Deployment**: Docker Compose orchestration for easy deployment
 
 ## Architecture
+This project follows **SOLID principles** and implements multiple **design patterns** for maintainability and scalability.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Frontend (React)                         │
-│  ┌────────────┐  ┌────────────┐  ┌──────────────┐              │
-│  │ Dashboard  │  │   Jobs     │  │    Auth      │              │
-│  │ Component  │  │ Components │  │  (Auth0)     │              │
-│  └────────────┘  └────────────┘  └──────────────┘              │
-└────────────────────────────┬────────────────────────────────────┘
-                             │ HTTP/REST API
-┌────────────────────────────┴────────────────────────────────────┐
-│                      Backend (FastAPI)                           │
-│  ┌────────────┐  ┌────────────┐  ┌──────────────┐              │
-│  │   Routes   │  │  Services  │  │     Auth     │              │
-│  │  /api/*    │  │  Business  │  │  JWT/Auth0   │              │
-│  │            │  │   Logic    │  │              │              │
-│  └────────────┘  └────────────┘  └──────────────┘              │
-└────────────┬───────────────┬─────────────────────────────────┬──┘
-             │               │                                 │
-    ┌────────┴────────┐ ┌───┴──────────┐          ┌──────────┴─────┐
-    │   PostgreSQL    │ │    Redis     │          │     Celery     │
-    │   (Database)    │ │ (Task Queue) │          │   (Workers)    │
-    └─────────────────┘ └──────────────┘          └────────────────┘
-```
+### Quick Architecture Overview
+
+- **Layered Architecture**: Presentation → Business Logic → Data Access
+- **Design Patterns**: Strategy, Repository, Factory, Dependency Injection, Facade
+- **SOLID Principles**: All five principles implemented throughout
+- **Dependency Inversion**: Services depend on interfaces, not concrete implementations
+
+**📖 For detailed architecture documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md)**
+
+### Key Architectural Features
+
+- **Strategy Pattern** for pluggable job scrapers
+- **Repository Pattern** for abstracted data access
+- **Factory Pattern** for scraper creation
+- **Dependency Injection Container** for loose coupling
+- **Custom Exception Hierarchy** for better error handling
+- **Interface Segregation** for focused service contracts
+
+
 
 ## Tech Stack
 
@@ -842,8 +839,3 @@ If you find this project helpful, please consider:
 - Contributing improvements
 - Reporting bugs
 
----
-
-**Built with ❤️ by [Your Name]**
-
-**Last Updated**: 2025-11-07
