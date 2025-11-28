@@ -835,3 +835,5 @@ If you find this project helpful, please consider:
 - Contributing improvements
 - Reporting bugs
 
+---
+
